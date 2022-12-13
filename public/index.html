@@ -3,23 +3,43 @@
 <body>
   <p>This examples demonstrates the persistence of the scope.</p>
   <p>When you select a folder, you will be able to read its content even if you restart the app.</p>
-  <button id="dialog">Select folder</button>
+  <button id="dialog-dir">Select folder</button>
+  <button id="dialog-file">Select File</button>
   <div>
     <input id="file-path">
-    <button id="open-file">List contents</button>
+    <button id="open-dir">List contents</button>
+    <button id="open-file">Open file</button>
   </div>
+
+  <div id="file"></div>
   <p id="asset-protocol">Asset protocol: ?</p>
   <ul id="contents">fs protocol: ?</ul>
 
   <script async>
-    const dialogBtn = document.getElementById('dialog')
+    const dialogDirBtn = document.getElementById('dialog-dir')
+    const dialogFileBtn = document.getElementById('dialog-file')
+
+    const openDirBtn = document.getElementById('open-dir')
     const openFileBtn = document.getElementById('open-file')
+
     const input = document.getElementById('file-path')
+
     const pAssetProtocol = document.getElementById('asset-protocol')
     const outDiv = document.getElementById('contents')
+    const outDivFile = document.getElementById('file')
 
-    dialogBtn.addEventListener('click', () => {
-      window.__TAURI__.dialog.open({ multiple: false, directory: true }).then(p => {
+
+    dialogDirBtn.addEventListener('click', () => {
+      window.__TAURI__.dialog.open({ multiple: false, directory: true, recursive: true }).then(p => {
+        if (p) {
+          input.value = p
+          console.log(p)
+        }
+      })
+    })
+
+    dialogFileBtn.addEventListener('click', () => {
+      window.__TAURI__.dialog.open({ multiple: false, directory: false }).then(p => {
         if (p) {
           input.value = p
           console.log(p)
@@ -28,6 +48,17 @@
     })
 
     openFileBtn.addEventListener('click', () => {
+      window.__TAURI__.fs.readTextFile(input.value).then(contents => {
+        outDivFile.innerText = contents
+      }).catch(e => {
+        outDivFile.innerText = e
+      }).finally(_ => {
+        outDiv.innerText = ""
+      })
+      fetch(window.__TAURI__.tauri.convertFileSrc(input.value)).then(a => a.text().then(console.log))
+    })
+
+    openDirBtn.addEventListener('click', () => {
       window.__TAURI__.fs.readDir(input.value).then(contents => {
         console.log(contents)
         outDiv.innerHTML = ""
@@ -47,6 +78,8 @@
         });
       }).catch(e => {
         outDiv.innerText = e
+      }).finally(_ => {
+        outDivFile.innerText = ""
       })
     })
   </script>
