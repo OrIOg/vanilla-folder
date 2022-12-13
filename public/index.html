@@ -1,0 +1,55 @@
+<html>
+
+<body>
+  <p>This examples demonstrates the persistence of the scope.</p>
+  <p>When you select a folder, you will be able to read its content even if you restart the app.</p>
+  <button id="dialog">Select folder</button>
+  <div>
+    <input id="file-path">
+    <button id="open-file">List contents</button>
+  </div>
+  <p id="asset-protocol">Asset protocol: ?</p>
+  <ul id="contents">fs protocol: ?</ul>
+
+  <script async>
+    const dialogBtn = document.getElementById('dialog')
+    const openFileBtn = document.getElementById('open-file')
+    const input = document.getElementById('file-path')
+    const pAssetProtocol = document.getElementById('asset-protocol')
+    const outDiv = document.getElementById('contents')
+
+    dialogBtn.addEventListener('click', () => {
+      window.__TAURI__.dialog.open({ multiple: false, directory: true }).then(p => {
+        if (p) {
+          input.value = p
+          console.log(p)
+        }
+      })
+    })
+
+    openFileBtn.addEventListener('click', () => {
+      window.__TAURI__.fs.readDir(input.value).then(contents => {
+        console.log(contents)
+        outDiv.innerHTML = ""
+
+        // Asset Protocol
+        fetch(window.__TAURI__.tauri.convertFileSrc(contents[0].path)).then(res => {
+          pAssetProtocol.innerText = res.statusText
+        }).catch(e => {
+          pAssetProtocol.innerText = e
+        })
+
+        // FS Protocol
+        contents.forEach(element => {
+          const content = document.createElement("li")
+          content.innerText = element.name
+          outDiv.appendChild(content)
+        });
+      }).catch(e => {
+        outDiv.innerText = e
+      })
+    })
+  </script>
+</body>
+
+</html>
