@@ -3,6 +3,10 @@
 <body>
   <p>This examples demonstrates the persistence of the scope.</p>
   <p>When you select a folder, you will be able to read its content even if you restart the app.</p>
+  <label>
+    <input id="recursive" type="checkbox">
+    Recursive
+  </label>
   <button id="dialog-dir">Select folder</button>
   <button id="dialog-file">Select File</button>
   <div>
@@ -11,11 +15,12 @@
     <button id="open-file">Open file</button>
   </div>
 
-  <div id="file"></div>
   <p id="asset-protocol">Asset protocol: ?</p>
+  <div id="file"></div>
   <ul id="contents">fs protocol: ?</ul>
 
   <script async>
+    const checkboxRecursive = document.getElementById('recursive')
     const dialogDirBtn = document.getElementById('dialog-dir')
     const dialogFileBtn = document.getElementById('dialog-file')
 
@@ -30,7 +35,8 @@
 
 
     dialogDirBtn.addEventListener('click', () => {
-      window.__TAURI__.dialog.open({ multiple: false, directory: true, recursive: true }).then(p => {
+      const recursive = checkboxRecursive.checked;
+      window.__TAURI__.dialog.open({ multiple: false, directory: true, recursive }).then(p => {
         if (p) {
           input.value = p
           console.log(p)
@@ -55,7 +61,12 @@
       }).finally(_ => {
         outDiv.innerText = ""
       })
-      fetch(window.__TAURI__.tauri.convertFileSrc(input.value)).then(a => a.text().then(console.log))
+      // Asset Protocol
+      fetch(window.__TAURI__.tauri.convertFileSrc(input.value)).then(res => {
+          pAssetProtocol.innerText = res.statusText
+        }).catch(e => {
+          pAssetProtocol.innerText = e
+        })
     })
 
     openDirBtn.addEventListener('click', () => {
