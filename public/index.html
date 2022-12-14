@@ -3,95 +3,31 @@
 <body>
   <p>This examples demonstrates the persistence of the scope.</p>
   <p>When you select a folder, you will be able to read its content even if you restart the app.</p>
-  <label>
-    <input id="recursive" type="checkbox">
-    Recursive
-  </label>
   <button id="dialog-dir">Select folder</button>
-  <button id="dialog-file">Select File</button>
   <div>
     <input id="file-path">
-    <button id="open-dir">List contents</button>
     <button id="open-file">Open file</button>
   </div>
-
-  <p id="asset-protocol">Asset protocol: ?</p>
-  <div id="file"></div>
-  <ul id="contents">fs protocol: ?</ul>
+  <input type="text" style="width: 100%;" disabled id="file"/>
 
   <script async>
-    const checkboxRecursive = document.getElementById('recursive')
     const dialogDirBtn = document.getElementById('dialog-dir')
-    const dialogFileBtn = document.getElementById('dialog-file')
-
-    const openDirBtn = document.getElementById('open-dir')
     const openFileBtn = document.getElementById('open-file')
+    const filePath = document.getElementById('file-path')
 
-    const input = document.getElementById('file-path')
 
-    const pAssetProtocol = document.getElementById('asset-protocol')
-    const outDiv = document.getElementById('contents')
     const outDivFile = document.getElementById('file')
 
-
     dialogDirBtn.addEventListener('click', () => {
-      const recursive = checkboxRecursive.checked;
-      window.__TAURI__.dialog.open({ multiple: false, directory: true, recursive }).then(p => {
-        if (p) {
-          input.value = p
-          console.log(p)
-        }
-      })
-    })
-
-    dialogFileBtn.addEventListener('click', () => {
-      window.__TAURI__.dialog.open({ multiple: false, directory: false }).then(p => {
-        if (p) {
-          input.value = p
-          console.log(p)
-        }
+      window.__TAURI__.dialog.open({ multiple: false, directory: true, recursive: false }).then(p => {
+          outDivFile.value = p
       })
     })
 
     openFileBtn.addEventListener('click', () => {
-      window.__TAURI__.fs.readTextFile(input.value).then(contents => {
-        outDivFile.innerText = contents
-      }).catch(e => {
-        outDivFile.innerText = e
-      }).finally(_ => {
-        outDiv.innerText = ""
-      })
-      // Asset Protocol
-      fetch(window.__TAURI__.tauri.convertFileSrc(input.value)).then(res => {
-          pAssetProtocol.innerText = res.statusText
-        }).catch(e => {
-          pAssetProtocol.innerText = e
-        })
-    })
-
-    openDirBtn.addEventListener('click', () => {
-      window.__TAURI__.fs.readDir(input.value).then(contents => {
-        console.log(contents)
-        outDiv.innerHTML = ""
-
-        // Asset Protocol
-        fetch(window.__TAURI__.tauri.convertFileSrc(contents[0].path)).then(res => {
-          pAssetProtocol.innerText = res.statusText
-        }).catch(e => {
-          pAssetProtocol.innerText = e
-        })
-
-        // FS Protocol
-        contents.forEach(element => {
-          const content = document.createElement("li")
-          content.innerText = element.name
-          outDiv.appendChild(content)
-        });
-      }).catch(e => {
-        outDiv.innerText = e
-      }).finally(_ => {
-        outDivFile.innerText = ""
-      })
+      window.__TAURI__.fs.readBinaryFile(filePath.value).then(p => {
+        outDivFile.value = p;
+      }).catch(p => outDivFile.value = p)
     })
   </script>
 </body>

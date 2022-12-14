@@ -44,7 +44,6 @@ version = "0.1.0"
 dependencies = [
  "tauri",
  "tauri-build",
- "tauri-plugin-persisted-scope",
 ]
 
 [[package]]
@@ -82,15 +81,6 @@ name = "base64"
 version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
-
-[[package]]
-name = "bincode"
-version = "1.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "bitflags"
@@ -2461,18 +2451,6 @@ dependencies = [
  "syn",
  "tauri-codegen",
  "tauri-utils",
-]
-
-[[package]]
-name = "tauri-plugin-persisted-scope"
-version = "0.1.0"
-source = "git+https://github.com/OrIOg/tauri-plugin-persisted-scope#eec3cc803b8722ca80765e8088e90347288d42e6"
-dependencies = [
- "bincode",
- "serde",
- "serde_json",
- "tauri",
- "thiserror",
 ]
 
 [[package]]
