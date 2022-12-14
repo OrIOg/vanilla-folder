@@ -12,7 +12,7 @@ tauri = { version = "1.2.2", features = ["dialog-open", "fs-read-dir", "fs-read-
 tauri-plugin-persisted-scope = { git = "https://github.com/OrIOg/tauri-plugin-persisted-scope", features = ["protocol-asset"] }
 
 [build-dependencies]
-tauri-build = { version = "1.0", features = [] }
+tauri-build = { version = "1.2.1", features = [] }
 
 [features]
 default = [ "custom-protocol" ]
